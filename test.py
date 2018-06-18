@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import os
 
-import data.omniglot as omniglot
+from data.load_data as Sinusoid
 
-print(omniglot.data_dir)
-omniglot.pre_processing()
+sinusoid = Sinusoid()
+print(sinusoid.sample_task())
