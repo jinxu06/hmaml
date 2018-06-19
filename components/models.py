@@ -11,7 +11,13 @@ from components.layers import conv2d, dense
 
 DEFAULT_OPTIMIZER = partial(tf.train.AdamOptimizer, beta1=0)
 
-# pylint: disable=R0903
+
+class SinusoidModel:
+
+    def __init__(self):
+        pass 
+
+
 class OmniglotModel:
     """
     A model for Omniglot classification.
@@ -29,7 +35,7 @@ class OmniglotModel:
         self.predictions = tf.argmax(self.logits, axis=-1)
         self.minimize_op = optimizer(**optim_kwargs).minimize(self.loss)
 
-# pylint: disable=R0903
+
 class MiniImageNetModel:
     """
     A model for Mini-ImageNet classification.

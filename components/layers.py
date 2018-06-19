@@ -24,6 +24,7 @@ def dense(inputs, num_outputs, activation=None, norm="None", kernel_initializer=
     """ dense
     norm: batch_norm | layer_norm | None
     """
+    print(inputs)
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
     outputs = tf.layers.dense(inputs, num_outputs, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
