@@ -7,10 +7,9 @@ import time
 
 import tensorflow as tf
 
-from components.meta_learners import Reptile
+from components.meta_learners import MAML, FOML, Reptile, HMAML
 from misc.variables import weight_decay
 
-# pylint: disable=R0913,R0914
 def train(sess,
           model,
           train_set,
@@ -32,7 +31,7 @@ def train(sess,
           time_deadline=None,
           train_shots=None,
           transductive=False,
-          reptile_fn=Reptile,
+          meta_learner=Reptile,
           log_fn=print):
     """
     Train a model on a dataset.
@@ -40,7 +39,7 @@ def train(sess,
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
     saver = tf.train.Saver()
-    reptile = reptile_fn(sess,
+    reptile = meta_learner(sess,
                          transductive=transductive,
                          pre_step_op=weight_decay(weight_decay_rate))
     accuracy_ph = tf.placeholder(tf.float32, shape=())

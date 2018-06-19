@@ -7,7 +7,7 @@ from functools import partial
 
 import tensorflow as tf
 
-from components.meta_learners import Reptile, FOML
+from components.meta_learners import MAML, Reptile, FOML, HMAML
 
 def argument_parser():
     """

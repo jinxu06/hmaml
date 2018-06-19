@@ -2,10 +2,9 @@
 Helpers for evaluating models.
 """
 
-from components.meta_learners import Reptile
+from components.meta_learners import MAML, FOML, Reptile, HMAML
 from misc.variables import weight_decay
 
-# pylint: disable=R0913,R0914
 def evaluate(sess,
              model,
              dataset,
@@ -17,11 +16,11 @@ def evaluate(sess,
              num_samples=10000,
              transductive=False,
              weight_decay_rate=1,
-             reptile_fn=Reptile):
+             meta_learner=Reptile):
     """
     Evaluate a model on a dataset.
     """
-    reptile = reptile_fn(sess,
+    reptile = meta_learner(sess,
                          transductive=transductive,
                          pre_step_op=weight_decay(weight_decay_rate))
     total_correct = 0

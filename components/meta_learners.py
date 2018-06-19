@@ -193,6 +193,11 @@ class MAML(MetaLearner):
                    meta_batch_size):
         pass
 
+class HMAML(MetaLearner):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 def _sample_mini_dataset(dataset, num_classes, num_shots):
     """
