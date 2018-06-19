@@ -12,7 +12,8 @@ from components.models import OmniglotModel
 from data.omniglot import read_dataset, split_dataset, augment_dataset
 from executions.train import train
 
-DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data/omniglot"
+# DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data/omniglot"
+DATA_DIR = "/data/ziz/not-backed-up/jxu/omniglot"
 
 def main():
     """
