@@ -73,7 +73,7 @@ def train_kwargs(parsed_args):
         'eval_interval': parsed_args.eval_interval,
         'weight_decay_rate': parsed_args.weight_decay,
         'transductive': parsed_args.transductive,
-        'reptile_fn': _args_reptile(parsed_args)
+        'meta_learner': _args_reptile(parsed_args)
     }
 
 def evaluate_kwargs(parsed_args):
@@ -90,7 +90,7 @@ def evaluate_kwargs(parsed_args):
         'weight_decay_rate': parsed_args.weight_decay,
         'num_samples': parsed_args.eval_samples,
         'transductive': parsed_args.transductive,
-        'reptile_fn': _args_reptile(parsed_args)
+        'meta_learner': _args_reptile(parsed_args)
     }
 
 def _args_reptile(parsed_args):
