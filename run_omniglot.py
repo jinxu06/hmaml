@@ -1,9 +1,8 @@
 """
 Train a model on Omniglot.
 """
-
+import os
 import random
-
 import tensorflow as tf
 
 from misc.args import argument_parser, model_kwargs, train_kwargs, evaluate_kwargs
