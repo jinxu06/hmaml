@@ -79,7 +79,6 @@ class Reptile(MetaLearner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    # pylint: disable=R0913,R0914
     def train_step(self,
                    dataset,
                    input_ph,
