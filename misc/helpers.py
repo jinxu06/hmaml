@@ -3,9 +3,10 @@ import tensorflow as tf
 
 def int_shape(x):
     s = x.get_shape()
-    if not isinstance(s[0], int):
-        s[0] = -1
-    return list(map(int, s))
+    if isinstance(s[0], int):
+        return list(map(int, s))
+    else:
+        return [-1] + list(map(int, s[1:]))
 
 def get_name(layer_name, counters):
     if not layer_name in counters:
