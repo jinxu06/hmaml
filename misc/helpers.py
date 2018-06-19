@@ -3,7 +3,7 @@ import tensorflow as tf
 
 def int_shape(x):
     s = x.get_shape()
-    if not s[0]:
+    if not isinstance(s[0], int):
         s[0] = -1
     return list(map(int, s))
 
