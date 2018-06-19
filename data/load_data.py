@@ -3,7 +3,7 @@ import os
 
 class Task(object):
 
-    def __init__(self, task_type='classification', num_classes):
+    def __init__(self, task_type='classification', num_classes=1):
         """ task_type: classification | regression | density_estimation
         """
         self.task_type = task_type
@@ -17,58 +17,54 @@ class Task(object):
 
 class Dataset(object):
 
-    def __init__(self, batch_size, meta_batch_size, rng=np.random.RandomState(1)):
+    def __init__(self, meta_batch_size, num_samples_per_class, dim_input, dim_output, task_type, rng=np.random.RandomState(1)):
+        # hyperparameters
         self.rng = rng
-        self.batch_size = batch_size
         self.meta_batch_size = meta_batch_size
-
+        self.num_samples_per_class = num_samples_per_class
+        # task descriptions
+        self.dim_input = dim_input
+        self.dim_output = dim_output
+        self.task_type = task_type
+        # datasets
         self.train = None
         self.val = None
         self.test = None
 
-    def sample_task(self, task_type='classification', dataset='train'):
-        pass
-
-    def train(self, shuffle=False, limit=-1):
-        pass
-
-    def val(self, shuffle=False, limit=-1):
-        pass
-
-    def test(self.shuffle=False, limit=-1):
+    def sample_batch_of_tasks(self, dataset='train'):
         pass
 
 
 class Sinusoid(Dataset):
 
-    def __init__(self):
-        super().__init__()
-        self.amp_range = [0.1, 5.0]
-        self.phase_range = [0, np.pi]
-        self.input_range = [-5.0, 5.0]
-        self.dim_inputs = 1
-        self.dim_outputs = 1
+    def __init__(self, amp_range, phase_range, input_range, meta_batch_size, num_samples_per_class, rng=np.random.RandomState(1)):
+        super().__init__(meta_batch_size, num_samples_per_class, 1, 1, 'regression', rng)
+        self.amp_range = amp_range
+        self.phase_range = phase_range
+        self.input_range = input_range
 
-    def sample_task(self, task_type='regression', dataset='train'):
-        amp = np.random.uniform(self.amp_range[0], self.amp_range[1], [self.batch_size])
-        phase = np.random.uniform(self.phase_range[0], self.phase_range[1], [self.batch_size])
-        outputs = np.zeros([self.batch_size, self.num_samples_per_class, self.dim_output])
-        init_inputs = np.zeros([self.batch_size, self.num_samples_per_class, self.dim_input])
-        for func in range(self.batch_size):
-            init_inputs[func] = np.random.uniform(self.input_range[0], self.input_range[1], [self.num_samples_per_class, 1])
-            if input_idx is not None:
-                init_inputs[:,input_idx:,0] = np.linspace(self.input_range[0], self.input_range[1], num=self.num_samples_per_class-input_idx, retstep=False)
-            outputs[func] = amp[func] * np.sin(init_inputs[func]-phase[func])
-        return init_inputs, outputs, amp, phase
+    def sample_batch_of_tasks(self, dataset='train'):
 
+        amp_batch = self.rng.uniform(self.amp_range[0], self.amp_range[1], [self.meta_batch_size])
+        phase_batch = self.rng.uniform(self.phase_range[0], self.phase_range[1], [self.meta_batch_size])
+
+        dim_input, dim_output = 1, 1
+        inputs = np.zeros([self.meta_batch_size, self.num_samples_per_class, dim_input])
+        outputs = np.zeros([self.meta_batch_size, self.num_samples_per_class, dim_output])
+
+        for b in range(self.meta_batch_size):
+            inputs[b] = self.rng.uniform(self.input_range[0], self.input_range[1], [self.num_samples_per_class, 1])
+            outputs[b] = amp_batch[b] * np.sin(inputs[b]-phase_batch[b])
+        return inputs, outputs, (amp_batch, phase_batch)
 
 
 class Omniglot(Dataset):
 
-    def __init__(self):
-        self.num_classes = 0
-        self.img_size = 0
-        self.data_dir = ""
+    def __init__(self, meta_batch_size, num_samples_per_class, num_classes, rng=np.random.RandomState(1)):
+        super().__init__(meta_batch_size, num_samples_per_class, 28*28, 5,num_classes, rng)
+        self.num_classes = num_classes
+
+    def sample_batch_of_tasks(self, dataset='train'):
 
 
 class MiniImagenet(Dataset):

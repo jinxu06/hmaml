@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
-from blocks.helpers import int_shape, get_name
+from misc.helpers import int_shape, get_name
 
 @add_arg_scope
 def conv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', activation=None, norm="batch_norm", kernel_initializer=None, kernel_regularizer=None, is_training=False):
