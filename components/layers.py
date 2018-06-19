@@ -3,8 +3,9 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from misc.helpers import int_shape, get_name
 
+
 @add_arg_scope
-def conv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', activation=None, norm="batch_norm", kernel_initializer=None, kernel_regularizer=None, is_training=False):
+def conv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', activation=None, norm="None", kernel_initializer=None, kernel_regularizer=None, is_training=False):
     """  conv2d
     norm: batch_norm | layer_norm | None
     """
@@ -20,7 +21,7 @@ def conv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', activati
     return outputs
 
 @add_arg_scope
-def dense(inputs, num_outputs, activation=None, norm=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
+def dense(inputs, num_outputs, activation=None, norm="None", kernel_initializer=None, kernel_regularizer=None, is_training=False):
     """ dense
     norm: batch_norm | layer_norm | None
     """
