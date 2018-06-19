@@ -17,7 +17,6 @@ def conv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', activati
 
     if activation is not None:
         outputs = activation(outputs)
-    print("    + conv2d", int_shape(inputs), int_shape(outputs), activation, norm)
     return outputs
 
 @add_arg_scope
@@ -34,5 +33,4 @@ def dense(inputs, num_outputs, activation=None, norm="None", kernel_initializer=
         outputs = tf.layers.layer_norm(outputs)
     if activation is not None:
         outputs = activation(outputs)
-    print("    + dense", int_shape(inputs), int_shape(outputs), activation, norm)
     return outputs
