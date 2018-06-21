@@ -4,45 +4,34 @@ import random
 from PIL import Image
 import numpy as np
 
+def read_dataset(num_funcs, amp_range=[0.1, 5.0], phase_range=[0, np.pi], input_range=[-5.0, 5.0], rng=np.random.RandomState(0)):
+    amps = rng.uniform(amp_range[0], amp_range[1], [num_funcs])
+    phases = rng.uniform(phase_range[0], phase_range[1], [num_funcs])
+    for amp, phase in zip(amps, phases):
+        yield SineWave(amp, phase, input_range, rng)
+
+def split_dataset(dataset, num_train):
+    all_data = list(dataset)
+    random.shuffle(all_data)
+    return all_data[:num_train], all_data[num_train:]
+
+
 class SineWave(object):
     """
     A single sine wave class.
     """
-    def __init__(self, amp, phase):
+    def __init__(self, amp, phase, input_range, rng=np.random.RandomState(0)):
         self.amp = amp
         self.phase = phase
+        self.input_range = input_range
+        self.rng = rng
 
-    def sample(self, num_inputs):
-        """
-        Sample SineWave (as numpy arrays) from the class.
-
-        Returns:
-          ...
-        """
-
-
-        names = [f for f in os.listdir(self.dir_path) if f.endswith('.JPEG')]
-        random.shuffle(names)
-        images = []
-        for name in names[:num_images]:
-            images.append(self._read_image(name))
-        return images
-
-    def _generate_function(self, amp, phase):
-        pass
-
-
-    def _read_image(self, name):
-        if name in self._cache:
-            return self._cache[name].astype('float32') / 0xff
-        with open(os.path.join(self.dir_path, name), 'rb') as in_file:
-            img = Image.open(in_file).resize((84, 84)).convert('RGB')
-            self._cache[name] = np.array(img)
-            return self._read_image(name)
-
-
-
-
+    def sample(self, num_samples):
+        inputs = self.rng.uniform(self.input_range[0], self.input_range[1], [num_samples,1])
+        outputs = self.amp * np.sin(inputs - self.phase)
+        samples = np.concatenate([inputs, outputs], axis=-1)
+        self.rng.shuffle(samples)
+        return samples
 
 
 # import os
