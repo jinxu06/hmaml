@@ -1,23 +1,56 @@
 import numpy as np
 import tensorflow as tf
-import os
+import matplotlib.pyplot as plt
+plt.style.use("ggplot")
 
-# from data.load_data import Sinusoid
+import data.omniglot as omniglot
+import data.sinusoid as sinusoid
+import data.miniimagenet as miniimagenet
+
+
+from data.load_data import Dataset
+
+
+from data.omniglot import read_dataset, split_dataset, augment_dataset
+
+from misc.plots import visualize_binary_images
+
+DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data/omniglot"
+
+data_source = omniglot.OmniglotDataSource(data_dir=DATA_DIR)
+dataset = Dataset(data_source=data_source, task_type='classification')
+
+s = list(dataset.sample_mini_dataset(num_shots=10, num_classes=5))
+images = []
+for k in s:
+    images.append(k[0])
+images = np.array(images)
+v = visualize_binary_images(images, layout=(5,10))
+plt.imshow(v)
+plt.show()
+
+# data_source = sinusoid.SinusoidDataSource()
+# dataset = Dataset(data_source=data_source)
 #
+# s = list(dataset.sample_mini_dataset(num_shots=200, task_type='regression'))
+# s = np.array(s)
+# inputs, labels = s[:, 0], s[:, 1]
+# plt.scatter(inputs, labels)
+#
+# s = list(dataset.sample_mini_dataset(num_shots=200, task_type='regression'))
+# s = np.array(s)
+# inputs, labels = s[:, 0], s[:, 1]
+# plt.scatter(inputs, labels)
+#
+# s = list(dataset.sample_mini_dataset(num_shots=200, task_type='regression'))
+# s = np.array(s)
+# inputs, labels = s[:, 0], s[:, 1]
+# plt.scatter(inputs, labels)
 
-# dgen = Sinusoid(amp_range=[0.1, 5.0], phase_range=[0, np.pi], input_range=[-5., 5.], meta_batch_size=5, num_samples_per_class=10)
-# inputs, outputs, _ = dgen.sample_batch_of_tasks()
-# print(inputs)
-# print(outputs)
+# plt.show()
 
-
-DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data"
-
-omniglot_dir = os.path.join(DATA_DIR, "omniglot")
-
-from data.omniglot import *
-
-rt = read_dataset(omniglot_dir)
-
-for item in rt:
-    print(item)
+# s = g1.sample(200)
+# plt.scatter(s[:,0], s[:,1])
+# s = g2.sample(200)
+# plt.scatter(s[:,0], s[:,1])
+# plt.show()

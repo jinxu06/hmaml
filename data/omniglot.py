@@ -11,6 +11,38 @@ import random
 from PIL import Image
 import numpy as np
 
+from .data_source import DataSource
+
+
+class OmniglotDataSource(DataSource):
+
+    def __init__(self, data_dir):
+        self.data_dir = data_dir
+        self.data = None
+        
+    def _load(self):
+        self.data = read_dataset(self.data_dir)
+
+    def split_train_test(self, num_train, augment_train_set=True):
+        if self.data is None:
+            self._load()
+        self.train_set, self.test_set = split_dataset(self.data)
+        if augment_train_set:
+            self.train_set = list(augment_dataset(self.train_set))
+        self.test_set = list(self.test_set)
+
+    def sample_classes(self, num_classes, which_set='train'):
+        if which_set == 'train':
+            dataset = self.train_set
+        elif which_set == 'test':
+            dataset = self.test_set
+        else:
+            raise Exception('which_set is either train or test')
+        shuffled = list(dataset)
+        random.shuffle(shuffled)
+        return shuffled[:num_classes]
+
+
 def read_dataset(data_dir):
     """
     Iterate over the characters in a data directory.
@@ -28,7 +60,7 @@ def read_dataset(data_dir):
         for char_name in sorted(os.listdir(alphabet_dir)):
             if not char_name.startswith('character'):
                 continue
-            yield Character(os.path.join(alphabet_dir, char_name), 0)
+            yield Character(os.path.join(alphabet_dir, char_name), 0, tags={'alphabet': alphabet_name, 'character': char_name, 'rotation': 0})
 
 def split_dataset(dataset, num_train=1200):
     """
@@ -52,17 +84,20 @@ def augment_dataset(dataset):
     """
     for character in dataset:
         for rotation in [0, 90, 180, 270]:
-            yield Character(character.dir_path, rotation=rotation)
+            tags = character.tags
+            tags.update({'rotation': rotation})
+            yield Character(character.dir_path, rotation=rotation, tags=tags)
 
-# pylint: disable=R0903
+
 class Character:
     """
     A single character class.
     """
-    def __init__(self, dir_path, rotation=0):
+    def __init__(self, dir_path, rotation=0, tags={}):
         self.dir_path = dir_path
         self.rotation = rotation
         self._cache = {}
+        self.tags = tags.copy()
 
     def sample(self, num_images):
         """

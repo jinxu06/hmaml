@@ -10,6 +10,8 @@ from executions.eval import evaluate
 from components.models import OmniglotModel
 from data.omniglot import read_dataset, split_dataset, augment_dataset
 from executions.train import train
+from data.omniglot import OmniglotDataSource
+from data.load_data import Dataset
 
 DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data/omniglot"
 CHECKPOINT_DIR = "model_checkpoint"
@@ -27,9 +29,10 @@ def main():
     args.checkpoint_dir = CHECKPOINT_DIR ###
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
 
-    train_set, test_set = split_dataset(read_dataset(DATA_DIR))
-    train_set = list(augment_dataset(train_set))
-    test_set = list(test_set)
+    data_source = OmniglotDataSource(data_dir=DATA_DIR)
+    data_source.split_train_test(num_train=1200)
+    train_set = Dataset(data_source, which_set='train', task_type='classification')
+    test_set = Dataset(data_source, which_set='test', task_type='classification')
 
     model = OmniglotModel(args.classes, **model_kwargs(args))
 

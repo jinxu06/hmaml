@@ -55,7 +55,7 @@ class SinusoidModel(RegressionModel):
 
     def __init__(self, optimizer=DEFAULT_OPTIMIZER, **optim_kwargs):
         self.input_ph = tf.placeholder(tf.float32, shape=(None, 1))
-        self.label_ph = tf.placeholder(tf.float32, shape=(None, 1))
+        self.label_ph = tf.placeholder(tf.float32, shape=(None,))
         super().__init__(optimizer=DEFAULT_OPTIMIZER, **optim_kwargs)
 
     def _model(self):

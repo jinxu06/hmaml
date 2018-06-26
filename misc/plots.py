@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot plt
+import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
 
@@ -27,9 +27,10 @@ def visualize_rgb_images(images, save_path=None, layout=[5,5], value_range=[-1.,
     view = Image.fromarray(view, 'RGB')
     view.save(save_path)
 
+
 def visualize_binary_images(images, save_path=None, layout=[5,5]):
-    "untest"
-    images = np.rint(images).astype(np.bool)
+    images = (np.rint(images) * 255).astype(np.uint8)
+    images = np.stack([images for i in range(3)], axis=-1)
     view = _tile_images(images, size=layout)
     if save_path is None:
         return view
