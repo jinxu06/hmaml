@@ -21,7 +21,7 @@ class MNISTClassifier(object):
         kernel_initializer = tf.contrib.layers.xavier_initializer()
         #kernel_regularizer =
         out = tf.reshape(inputs, (-1, 28, 28, 1))
-        with arg_scope([conv2d, dense], kernel_initializer=kernel_initializer, activation=tf.nn.relu, norm="batch_norm", is_training=self.is_training)
+        with arg_scope([conv2d, dense], kernel_initializer=kernel_initializer, activation=tf.nn.relu, norm="batch_norm", is_training=self.is_training):
             out = conv2d(out, 32, 5, strides=1, padding='SAME')
             out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
             out = conv2d(out, 64, 5, strides=1, padding='SAME')
