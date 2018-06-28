@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from components.layers import conv2d, dense
 
 class MNISTClassifier(object):
@@ -20,14 +21,14 @@ class MNISTClassifier(object):
         kernel_initializer = tf.contrib.layers.xavier_initializer()
         #kernel_regularizer =
         out = tf.reshape(inputs, (-1, 28, 28, 1))
-
-        out = conv2d(out, 32, 5, strides=1, padding='SAME', activation=tf.nn.relu, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
-        out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        out = conv2d(out, 64, 5, strides=1, padding='SAME', activation=tf.nn.relu, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
-        out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        out = tf.layers.Flatten()(out)
-        out = dense(out, 1024, activation=tf.nn.relu, norm="None", is_training=self.is_training)
-        out = dense(out, self.num_classes, activation=None, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
+        with arg_scope([conv2d, dense], kernel_initializer=kernel_initializer, activation=tf.nn.relu, norm="batch_norm", is_training=self.is_training)
+            out = conv2d(out, 32, 5, strides=1, padding='SAME')
+            out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+            out = conv2d(out, 64, 5, strides=1, padding='SAME')
+            out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+            out = tf.layers.Flatten()(out)
+            out = dense(out, 1024)
+            out = dense(out, self.num_classes, activation=None)
         return out
 
     def _loss(self, outputs, targets):
