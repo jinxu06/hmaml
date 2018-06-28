@@ -1,56 +1,66 @@
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
-plt.style.use("ggplot")
+# import matplotlib.pyplot as plt
+# plt.style.use("ggplot")
 
-import data.omniglot as omniglot
-import data.sinusoid as sinusoid
-import data.miniimagenet as miniimagenet
+import data.mnist as mnist
+from models.classifiers import MNISTClassifier
 
+datasets = mnist.load(batch_size=1000)
 
-from data.load_data import Dataset
+from data.data_iterator import DataIterator
 
+data_iter = DataIterator(train_set=datasets[0], val_set=datasets[1], test_set=datasets[2])
 
-from data.omniglot import read_dataset, split_dataset, augment_dataset
+model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
 
-from misc.plots import visualize_binary_images
+optimizer = tf.train.AdamOptimizer().minimize(model.loss)
+global_init_op = tf.global_variables_initializer()
 
-DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data/omniglot"
+def train_epoch(model, optimizer, data_iter, metrics=["loss", "accuracy"]):
+    ops = [model.evals[m] for m in metrics]
+    ops += [optimizer]
+    evals_sum = {m:0. for m in metrics}
+    sess.run(data_iter.init_train_set_op)
+    count = 0
+    while True:
+        try:
+            *evals, _ = sess.run(ops)
+            for i, m in enumerate(metrics):
+                evals_sum[m] += evals[i]
+            count += 1
+        except tf.errors.OutOfRangeError:
+            break
+    evals_mean = {m:evals_sum[m] / count for m in metrics}
+    return evals_mean
 
-data_source = omniglot.OmniglotDataSource(data_dir=DATA_DIR)
-dataset = Dataset(data_source=data_source, task_type='classification')
+def eval_epoch(model, which_set, data_iter, metrics=["loss", "accuracy"]):
+    ops = [model.evals[m] for m in metrics]
+    evals_sum = {m:0. for m in metrics}
+    if which_set == 'train':
+        sess.run(data_iter.init_train_set_op)
+    elif which_set == 'val':
+        sess.run(data_iter.init_val_set_op)
+    elif which_set == 'test':
+        sess.run(data_iter.init_test_set_op)
+    count = 0
+    while True:
+        try:
+            evals = sess.run(ops)
+            for i, m in enumerate(metrics):
+                evals_sum[m] += evals[i]
+            count += 1
+        except tf.errors.OutOfRangeError:
+            break
+    evals_mean = {m:evals_sum[m] / count for m in metrics}
+    return evals_mean
 
-s = list(dataset.sample_mini_dataset(num_shots=10, num_classes=5))
-images = []
-for k in s:
-    images.append(k[0])
-images = np.array(images)
-v = visualize_binary_images(images, layout=(5,10))
-plt.imshow(v)
-plt.show()
-
-# data_source = sinusoid.SinusoidDataSource()
-# dataset = Dataset(data_source=data_source)
-#
-# s = list(dataset.sample_mini_dataset(num_shots=200, task_type='regression'))
-# s = np.array(s)
-# inputs, labels = s[:, 0], s[:, 1]
-# plt.scatter(inputs, labels)
-#
-# s = list(dataset.sample_mini_dataset(num_shots=200, task_type='regression'))
-# s = np.array(s)
-# inputs, labels = s[:, 0], s[:, 1]
-# plt.scatter(inputs, labels)
-#
-# s = list(dataset.sample_mini_dataset(num_shots=200, task_type='regression'))
-# s = np.array(s)
-# inputs, labels = s[:, 0], s[:, 1]
-# plt.scatter(inputs, labels)
-
-# plt.show()
-
-# s = g1.sample(200)
-# plt.scatter(s[:,0], s[:,1])
-# s = g2.sample(200)
-# plt.scatter(s[:,0], s[:,1])
-# plt.show()
+with tf.Session() as sess:
+    sess.run(global_init_op)
+    for k in range(100):
+        print("epoch", k)
+        evals = train_epoch(model, optimizer, data_iter)
+        print(evals)
+        if k%1 == 0:
+            evals = eval_epoch(model, 'val', data_iter)
+            print(evals)
