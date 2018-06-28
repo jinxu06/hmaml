@@ -17,7 +17,7 @@ model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=dat
 optimizer = tf.train.AdamOptimizer().minimize(model.loss)
 global_init_op = tf.global_variables_initializer()
 
-def train_epoch(model, optimizer, data_iter, metrics=["loss", "accuracy"]):
+def train_epoch(sess, model, optimizer, data_iter, metrics=["loss", "accuracy"]):
     ops = [model.evals[m] for m in metrics]
     ops += [optimizer]
     evals_sum = {m:0. for m in metrics}
@@ -26,7 +26,6 @@ def train_epoch(model, optimizer, data_iter, metrics=["loss", "accuracy"]):
     while True:
         try:
             *evals, _ = sess.run(ops, feed_dict={model.is_training: True})
-            print(evals)
             for i, m in enumerate(metrics):
                 evals_sum[m] += evals[i]
             count += 1
@@ -35,7 +34,7 @@ def train_epoch(model, optimizer, data_iter, metrics=["loss", "accuracy"]):
     evals_mean = {m:evals_sum[m] / count for m in metrics}
     return evals_mean
 
-def eval_epoch(model, which_set, data_iter, metrics=["loss", "accuracy"]):
+def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
     ops = [model.evals[m] for m in metrics]
     evals_sum = {m:0. for m in metrics}
     if which_set == 'train':
@@ -62,8 +61,8 @@ with tf.Session(config=config) as sess:
     sess.run(global_init_op)
     for k in range(100):
         print("epoch", k)
-        evals = train_epoch(model, optimizer, data_iter)
+        evals = train_epoch(sess, model, optimizer, data_iter)
         print(evals)
         if k%1 == 0:
-            evals = eval_epoch(model, 'val', data_iter)
+            evals = eval_epoch(sess, model, 'val', data_iter)
             print(evals)
