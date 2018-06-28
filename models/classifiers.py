@@ -20,7 +20,7 @@ class MNISTClassifier(object):
         for _ in range(4):
             out = conv2d(out, 64, 3, strides=2, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=True)
         out = tf.reshape(out, (-1, int(np.prod(out.get_shape()[1:]))))
-        out = dense(out, self.num_classes, activation=None)
+        out = dense(out, self.num_classes, activation=None, norm='None')
         return out
 
     def _loss(self, outputs, targets):

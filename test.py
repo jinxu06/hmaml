@@ -52,6 +52,7 @@ def eval_epoch(model, which_set, data_iter, metrics=["loss", "accuracy"]):
             count += 1
         except tf.errors.OutOfRangeError:
             break
+    print(evals_sum)
     print(count)
     evals_mean = {m:evals_sum[m] / count for m in metrics}
     return evals_mean
