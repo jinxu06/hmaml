@@ -15,7 +15,6 @@ def load(batch_size, split=[50000, 10000, 10000], one_hot=True):
         end = begin + s
         X = images[begin:end]
         y = targets[begin:end]
-        print("y:", y.mean())
         X = tf.data.Dataset.from_tensor_slices(X)
         y = tf.data.Dataset.from_tensor_slices(y)
         if one_hot:
