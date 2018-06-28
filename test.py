@@ -55,7 +55,9 @@ def eval_epoch(model, which_set, data_iter, metrics=["loss", "accuracy"]):
     evals_mean = {m:evals_sum[m] / count for m in metrics}
     return evals_mean
 
-with tf.Session() as sess:
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as sess:
     sess.run(global_init_op)
     for k in range(100):
         print("epoch", k)
