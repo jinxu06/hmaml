@@ -4,7 +4,7 @@ import numpy as np
 
 def load(batch_size, split=[50000, 10000, 10000], one_hot=True):
     from sklearn.datasets import fetch_mldata
-    mnist = fetch_mldata('MNIST original', data_home="/Users/Aaron-MAC/mldata/scikit_learn_data")
+    mnist = fetch_mldata('MNIST original', data_home="~/scikit_learn_data")
     images = mnist['data'].astype(np.float32)
     targets = mnist['target'].astype(np.int32)
     datasets = []
