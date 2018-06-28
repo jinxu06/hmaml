@@ -23,7 +23,7 @@ class MNISTClassifier(object):
         for _ in range(2):
             out = dense(out, 50, activation=tf.nn.relu, norm="batch_norm", is_training=self.is_training)
             #out = conv2d(out, 16, 3, strides=1, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=self.is_training)
-        out = tf.reshape(out, (-1, int(np.prod(out.get_shape()[1:]))))
+        # out = tf.reshape(out, (-1, int(np.prod(out.get_shape()[1:]))))
         out = dense(out, self.num_classes, activation=None, norm='None', is_training=self.is_training)
         return out
 
