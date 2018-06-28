@@ -19,7 +19,6 @@ class MNISTClassifier(object):
 
     def _model(self, inputs):
         kernel_initializer = tf.contrib.layers.xavier_initializer()
-        #kernel_regularizer =
         out = tf.reshape(inputs, (-1, 28, 28, 1))
         with arg_scope([conv2d, dense], kernel_initializer=kernel_initializer, activation=tf.nn.relu, norm="batch_norm", is_training=self.is_training):
             out = conv2d(out, 32, 5, strides=1, padding='SAME')

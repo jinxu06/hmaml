@@ -60,12 +60,13 @@ def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
+    num_epoches = 50
     sess.run(global_init_op)
-    for k in range(100):
+    for k in range(num_epoches+1):
         print("epoch", k)
         evals = train_epoch(sess, model, optimizer, data_iter)
         print(evals)
-        if k%1 == 0:
+        if k%5 == 0:
             evals = eval_epoch(sess, model, 'train', data_iter)
             print(evals)
             evals = eval_epoch(sess, model, 'val', data_iter)
