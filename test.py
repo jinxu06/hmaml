@@ -6,7 +6,7 @@ import tensorflow as tf
 import data.mnist as mnist
 from models.classifiers import MNISTClassifier
 
-datasets = mnist.load(batch_size=1000, split=[50000,10000,10000])
+datasets = mnist.load(batch_size=100, split=[50000,10000,10000])
 
 from data.data_iterator import DataIterator
 
