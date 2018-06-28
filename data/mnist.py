@@ -18,8 +18,6 @@ def load(batch_size, split=[50000, 10000, 10000], one_hot=True):
         if one_hot:
             y = y.map(lambda z: tf.one_hot(z, 10))
         dataset = tf.data.Dataset.zip((X, y)).shuffle(s).batch(batch_size)
-        # iterator = tf.data.Iterator.from_structure(dataset.output_types, dataset.output_shapes)
-        # dataset = iterator.make_initializer(dataset)
         datasets.append(dataset)
         begin = end
     return datasets
