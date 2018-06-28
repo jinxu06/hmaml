@@ -12,7 +12,8 @@ from data.data_iterator import DataIterator
 
 data_iter = DataIterator(train_set=datasets[0], val_set=datasets[1], test_set=datasets[2])
 
-model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
+is_training = tf.placeholder(tf.bool, shape=())
+model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=data_iter.next_op[1], is_training=is_training)
 
 optimizer = tf.train.AdamOptimizer().minimize(model.loss)
 global_init_op = tf.global_variables_initializer()
@@ -25,7 +26,7 @@ def train_epoch(model, optimizer, data_iter, metrics=["loss", "accuracy"]):
     count = 0
     while True:
         try:
-            *evals, _ = sess.run(ops)
+            *evals, _ = sess.run(ops, feed_dict={model.is_training: True})
             for i, m in enumerate(metrics):
                 evals_sum[m] += evals[i]
             count += 1
@@ -46,7 +47,7 @@ def eval_epoch(model, which_set, data_iter, metrics=["loss", "accuracy"]):
     count = 0
     while True:
         try:
-            evals = sess.run(ops)
+            evals = sess.run(ops, feed_dict={model.is_training: False})
             for i, m in enumerate(metrics):
                 evals_sum[m] += evals[i]
             count += 1
