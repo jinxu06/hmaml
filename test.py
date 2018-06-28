@@ -64,5 +64,5 @@ with tf.Session(config=config) as sess:
         evals = train_epoch(model, optimizer, data_iter)
         print(evals)
         if k%1 == 0:
-            evals = eval_epoch(model, 'test', data_iter)
+            evals = eval_epoch(model, 'train', data_iter)
             print(evals)
