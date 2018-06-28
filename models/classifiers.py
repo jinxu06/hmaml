@@ -4,9 +4,9 @@ from components.layers import conv2d, dense
 
 class MNISTClassifier(object):
 
-    def __init__(self, num_classes, inputs=None, targets=None, is_training=True):
+    def __init__(self, num_classes, inputs=None, targets=None):
         self.num_classes = num_classes
-        self.is_training = is_training
+        self.is_training = tf.placeholder(tf.bool, shape=())
         if inputs is None:
             inputs = tf.placeholder(tf.float32, shape=(None, 28, 28))
         if targets is None:
@@ -19,9 +19,9 @@ class MNISTClassifier(object):
     def _model(self, inputs):
         out = tf.reshape(inputs, (-1, 28, 28, 1))
         for _ in range(2):
-            out = conv2d(out, 32, 3, strides=2, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=True)
+            out = conv2d(out, 32, 3, strides=2, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=self.is_training)
         out = tf.reshape(out, (-1, int(np.prod(out.get_shape()[1:]))))
-        out = dense(out, self.num_classes, activation=None, norm='None')
+        out = dense(out, self.num_classes, activation=None, norm='None', is_training=self.is_training)
         return out
 
     def _loss(self, outputs, targets):
