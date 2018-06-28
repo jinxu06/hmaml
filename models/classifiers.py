@@ -17,15 +17,13 @@ class MNISTClassifier(object):
         self.evals = self._eval(self.outputs, self.targets)
 
     def _model(self, inputs):
-        #kernel_initializer = tf.contrib.layers.xavier_initializer()
+        kernel_initializer = tf.contrib.layers.xavier_initializer()
         #kernel_regularizer =
-        #out = tf.reshape(inputs, (-1, 28, 28, 1))
-        out = tf.reshape(inputs, (-1,28*28))
+        out = tf.reshape(inputs, (-1, 28, 28, 1))
         for _ in range(2):
-            out = dense(out, 50, activation=tf.nn.relu, norm="batch_norm", is_training=self.is_training)
-            #out = conv2d(out, 16, 3, strides=1, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=self.is_training)
+            out = conv2d(out, 32, 5, strides=1, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=self.is_training, kernel_initializer=kernel_initializer)
         # out = tf.reshape(out, (-1, int(np.prod(out.get_shape()[1:]))))
-        out = dense(out, self.num_classes, activation=None, norm='None', is_training=self.is_training)
+        out = dense(out, self.num_classes, activation=None, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
         return out
 
     def _loss(self, outputs, targets):
