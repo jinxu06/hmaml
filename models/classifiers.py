@@ -20,10 +20,13 @@ class MNISTClassifier(object):
         kernel_initializer = tf.contrib.layers.xavier_initializer()
         #kernel_regularizer =
         out = tf.reshape(inputs, (-1, 28, 28, 1))
-        for _ in range(2):
-            out = conv2d(out, 32, 5, strides=1, padding='SAME', activation=tf.nn.relu, norm='batch_norm', is_training=self.is_training, kernel_initializer=kernel_initializer)
-            out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        out = tf.reshape(out, (-1, int(np.prod(out.get_shape()[1:]))))
+
+        out = conv2d(out, 32, 5, strides=1, padding='SAME', activation=tf.nn.relu, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
+        out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+        out = conv2d(out, 64, 5, strides=1, padding='SAME', activation=tf.nn.relu, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
+        out = tf.nn.max_pool(out, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+        out = tf.layers.Flatten()(out)
+        out = dense(out, 1024, activation=tf.nn.relu, norm="None", is_training=self.is_training)
         out = dense(out, self.num_classes, activation=None, norm='None', is_training=self.is_training, kernel_initializer=kernel_initializer)
         return out
 

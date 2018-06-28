@@ -26,7 +26,6 @@ def train_epoch(sess, model, optimizer, data_iter, metrics=["loss", "accuracy"])
     while True:
         try:
             *evals, _ = sess.run(ops, feed_dict={model.is_training: True})
-            print("train", evals)
             for i, m in enumerate(metrics):
                 evals_sum[m] += evals[i]
             count += 1
@@ -48,7 +47,6 @@ def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
     while True:
         try:
             evals = sess.run(ops, feed_dict={model.is_training: False})
-            print("val", evals)
             for i, m in enumerate(metrics):
                 evals_sum[m] += evals[i]
             count += 1
@@ -67,4 +65,8 @@ with tf.Session(config=config) as sess:
         print(evals)
         if k%1 == 0:
             evals = eval_epoch(sess, model, 'train', data_iter)
+            print(evals)
+            evals = eval_epoch(sess, model, 'val', data_iter)
+            print(evals)
+            evals = eval_epoch(sess, model, 'test', data_iter)
             print(evals)
