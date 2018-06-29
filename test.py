@@ -7,8 +7,12 @@ import data.mnist as mnist
 import data.omniglot as omniglot
 from models.classifiers import MNISTClassifier
 
+if os.path.exists("/Users/Aaron-MAC/mldata/omniglot"):
+    DATA_DIR = "/Users/Aaron-MAC/mldata/omniglot"
+else:
+    DATA_DIR = "/data/ziz/not-backed-up/jxu/omniglot"
 
-train_meta_dataset, test_meta_dataset = omniglot.load(data_dir="/Users/Aaron-MAC/mldata/omniglot", inner_batch_size=5, num_train=1200, augment_train_set=False, one_hot=True)
+train_meta_dataset, test_meta_dataset = omniglot.load(data_dir=DATA_DIR, inner_batch_size=5, num_train=1200, augment_train_set=False, one_hot=True)
 datasets = train_meta_dataset.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5)
 
 from data.data_iterator import DataIterator
