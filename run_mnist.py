@@ -16,7 +16,7 @@ model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=dat
 
 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):
-    optimizer = tf.train.AdamOptimizer().minimize(model.loss)
+    optimizer = tf.train.AdamOptimizer(1e-4).minimize(model.loss)
 global_init_op = tf.global_variables_initializer()
 
 def train_epoch(sess, model, optimizer, data_iter, metrics=["loss", "accuracy"]):
@@ -57,6 +57,10 @@ def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
     evals_mean = {m:evals_sum[m] / count for m in metrics}
     return evals_mean
 
+saver = tf.train.Saver()
+load_params = True
+save_dir = "/data/ziz/jxu/hmaml-saved-models"
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
@@ -71,5 +75,5 @@ with tf.Session(config=config) as sess:
             print(evals)
             evals = eval_epoch(sess, model, 'val', data_iter)
             print(evals)
-            evals = eval_epoch(sess, model, 'test', data_iter)
-            print(evals)
+
+    saver.save(sess, save_dir + '/params_' + "mnist" + '.ckpt')

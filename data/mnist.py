@@ -19,7 +19,6 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
     num_samples = images.shape[0]
     split = [int(np.rint(num_samples*s)) for s in split]
     split[-1] += num_samples - np.sum(split)
-    print(split)
     datasets = []
     begin = 0
     for s in split:

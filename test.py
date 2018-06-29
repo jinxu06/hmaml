@@ -9,7 +9,7 @@ from models.classifiers import MNISTClassifier
 
 
 train_meta_dataset, test_meta_dataset = omniglot.load(data_dir="/Users/Aaron-MAC/mldata/omniglot", inner_batch_size=5, num_train=1200, augment_train_set=False, one_hot=True)
-datasets = train_meta_dataset.sample_mini_dataset(num_classes=5, num_shots=19, test_shots=1)
+datasets = train_meta_dataset.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5)
 
 from data.data_iterator import DataIterator
 
@@ -19,7 +19,7 @@ model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=dat
 
 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):
-    optimizer = tf.train.AdamOptimizer().minimize(model.loss)
+    optimizer = tf.train.AdamOptimizer(1e-4).minimize(model.loss)
 global_init_op = tf.global_variables_initializer()
 
 def train_epoch(sess, model, optimizer, data_iter, metrics=["loss", "accuracy"]):
@@ -63,13 +63,13 @@ def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
-    num_epoches = 50
+    num_epoches = 2
     sess.run(global_init_op)
     for k in range(num_epoches+1):
         print("epoch", k)
         evals = train_epoch(sess, model, optimizer, data_iter)
         print(evals)
-        if k%5 == 0:
+        if k%1 == 0:
             evals = eval_epoch(sess, model, 'train', data_iter)
             print(evals)
             # evals = eval_epoch(sess, model, 'val', data_iter)
