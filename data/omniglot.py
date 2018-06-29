@@ -92,8 +92,8 @@ class MetaDataset(object):
         X_test = np.concatenate(X_test, axis=0)
         y_test = np.concatenate(y_test, axis=0)
 
-        train_set = self._load_dataset(X, y, num_classes, elf.inner_batch_size, self.one_hot)
-        test_set = self._load_dataset(X_test, y_test, num_classes, elf.inner_batch_size, self.one_hot)
+        train_set = self._load_dataset(X, y, num_classes, self.inner_batch_size, self.one_hot)
+        test_set = self._load_dataset(X_test, y_test, num_classes, self.inner_batch_size, self.one_hot)
         return train_set, test_set
 
 
