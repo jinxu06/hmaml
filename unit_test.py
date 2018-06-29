@@ -25,6 +25,8 @@ with tf.Session(config=config) as sess:
     learner = Learner(session=sess, model=model)
     for epoch in range(20):
         for k in range(500):
-            learner.one_shot_train_step(dataset, optimizer, batch_size=100, step_size=0.1)
+            print("    k", k)
+            learner.one_shot_train_step(dataset, optimizer, batch_size=10, step_size=0.1)
+        dataset.reset()
         evals = learner.evaluate(val_dataset)
         print(evals)
