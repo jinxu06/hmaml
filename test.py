@@ -1,4 +1,4 @@
-import os 
+import os
 import numpy as np
 import tensorflow as tf
 # import matplotlib.pyplot as plt
@@ -78,7 +78,7 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-    num_epoches = 2
+    num_epoches = 5
     sess.run(global_init_op)
     for k in range(num_epoches+1):
         print("epoch", k)
