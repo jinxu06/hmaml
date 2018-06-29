@@ -16,7 +16,7 @@ model = MNISTClassifier(num_classes=5, inputs=data_iter.next_op[0], targets=data
 
 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):
-    optimizer = tf.train.AdamOptimizer(1e-4).minimize(model.loss)
+    optimizer = tf.train.GradientDescentOptimizer(1e-1).minimize(model.loss)
 global_init_op = tf.global_variables_initializer()
 
 def train_epoch(sess, model, optimizer, data_iter, metrics=["loss", "accuracy"]):
