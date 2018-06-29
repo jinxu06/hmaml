@@ -3,7 +3,7 @@ import numpy as np
 
 
 def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=True):
-    classes = np.random.choice(10, num_classes, replace=False).astype(np.int32)
+    classes = [0, 1, 2, 3, 4] # np.random.choice(10, num_classes, replace=False).astype(np.int32)
     from sklearn.datasets import fetch_mldata
     mnist = fetch_mldata('MNIST original', data_home=data_dir)
     images = mnist['data'].astype(np.float32)
