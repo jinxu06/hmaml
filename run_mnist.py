@@ -64,7 +64,7 @@ save_dir = "/data/ziz/jxu/hmaml-saved-models"
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
-    num_epoches = 50
+    num_epoches = 20
     sess.run(global_init_op)
     for k in range(num_epoches+1):
         print("epoch", k)
