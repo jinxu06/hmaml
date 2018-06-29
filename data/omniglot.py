@@ -60,14 +60,14 @@ class MetaDataset(object):
         self.inner_batch_size = inner_batch_size
         self.one_hot = one_hot
 
-    def _load_dataset(self, X, y, batch_size, one_hot=True):
+    def _load_dataset(self, X, y, num_classes, batch_size, one_hot=True):
         num_samples = X.shape[0]
         p = np.random.permutation(X.shape[0])
         X, y = X[p], y[p]
         X = tf.data.Dataset.from_tensor_slices(X)
         y = tf.data.Dataset.from_tensor_slices(y)
         if one_hot:
-            y = y.map(lambda z: tf.one_hot(z, 10))
+            y = y.map(lambda z: tf.one_hot(z, num_classes))
         dataset = tf.data.Dataset.zip((X, y)).shuffle(num_samples).batch(batch_size)
         return dataset
 
@@ -92,8 +92,8 @@ class MetaDataset(object):
         X_test = np.concatenate(X_test, axis=0)
         y_test = np.concatenate(y_test, axis=0)
 
-        train_set = self._load_dataset(X, y, self.inner_batch_size, self.one_hot)
-        test_set = self._load_dataset(X_test, y_test, self.inner_batch_size, self.one_hot)
+        train_set = self._load_dataset(X, y, num_classes, elf.inner_batch_size, self.one_hot)
+        test_set = self._load_dataset(X_test, y_test, num_classes, elf.inner_batch_size, self.one_hot)
         return train_set, test_set
 
 

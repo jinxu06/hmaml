@@ -28,7 +28,7 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
         X = tf.data.Dataset.from_tensor_slices(X)
         y = tf.data.Dataset.from_tensor_slices(y)
         if one_hot:
-            y = y.map(lambda z: tf.one_hot(z, 10))
+            y = y.map(lambda z: tf.one_hot(z, len(classes)))
         dataset = tf.data.Dataset.zip((X, y)).shuffle(s).batch(batch_size)
         datasets.append(dataset)
         begin = end
