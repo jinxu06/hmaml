@@ -66,7 +66,7 @@ def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
     return evals_mean
 
 saver = tf.train.Saver()
-load_params = True
+load_params = False
 save_dir = "/data/ziz/jxu/hmaml-saved-models"
 
 
