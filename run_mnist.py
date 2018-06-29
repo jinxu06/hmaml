@@ -12,7 +12,7 @@ from data.data_iterator import DataIterator
 
 data_iter = DataIterator(train_set=datasets[0], val_set=datasets[1], test_set=datasets[2])
 
-model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
+model = MNISTClassifier(num_classes=5, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
 
 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):

@@ -15,7 +15,7 @@ from data.data_iterator import DataIterator
 
 data_iter = DataIterator(train_set=datasets[0], val_set=None, test_set=datasets[1])
 
-model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
+model = MNISTClassifier(num_classes=5, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
 
 update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):
@@ -60,9 +60,19 @@ def eval_epoch(sess, model, which_set, data_iter, metrics=["loss", "accuracy"]):
     evals_mean = {m:evals_sum[m] / count for m in metrics}
     return evals_mean
 
+saver = tf.train.Saver()
+load_params = True
+save_dir = "/data/ziz/jxu/hmaml-saved-models"
+
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
+    if load_params:
+        ckpt_file = save_dir + '/params_' + "mnist" + '.ckpt'
+        print('restoring parameters from', ckpt_file)
+        saver.restore(sess, ckpt_file)
+
     num_epoches = 2
     sess.run(global_init_op)
     for k in range(num_epoches+1):
