@@ -10,8 +10,93 @@ import random
 
 from PIL import Image
 import numpy as np
+import tensorflow as tf
 
 from .data_source import DataSource
+
+# def _sample_mini_dataset(data_dir, num_classes, num_shots=20):
+#     ds = OmniglotDataSource(data_dir=data_dir)
+#     ds.split_train_test(1200, augment_train_set=False)
+#     cs = ds.sample_classes(num_classes)
+#     X = []
+#     y = []
+#     for idx, c in enumerate(cs):
+#         X.append(c.sample(num_shots))
+#         y.append(np.array([idx for i in range(num_shots)]))
+#     X = np.concatenate(X, axis=0)
+#     y = np.concatenate(y, axis=0)
+#     return X, y
+
+# def load(data_dir, num_classes, num_shots, batch_size, split, one_hot=True):
+#     images, targets = _sample_mini_dataset(data_dir, num_classes)
+#     p = np.random.permutation(images.shape[0])
+#     images, targets = images[p], targets[p]
+#     datasets = []
+#     begin = 0
+#     for s in split:
+#         end = begin + s
+#         X = images[begin:end]
+#         y = targets[begin:end]
+#         X = tf.data.Dataset.from_tensor_slices(X)
+#         y = tf.data.Dataset.from_tensor_slices(y)
+#         if one_hot:
+#             y = y.map(lambda z: tf.one_hot(z, 10))
+#         dataset = tf.data.Dataset.zip((X, y)).shuffle(s).batch(batch_size)
+#         datasets.append(dataset)
+#         begin = end
+#     return datasets
+
+def load(data_dir, inner_batch_size, num_train=1200, augment_train_set=False, one_hot=True):
+    ds = OmniglotDataSource(data_dir=data_dir)
+    ds.split_train_test(num_train, augment_train_set=augment_train_set)
+    train_meta_dataset = MetaDataset(ds.train_set, inner_batch_size, one_hot)
+    test_meta_dataset = MetaDataset(ds.test_set, inner_batch_size, one_hot)
+    return train_meta_dataset, test_meta_dataset
+
+class MetaDataset(object):
+
+    def __init__(self, data_source, inner_batch_size, one_hot=True):
+        self.data_source = data_source
+        self.inner_batch_size = inner_batch_size
+        self.one_hot = one_hot
+
+    def _load_dataset(self, X, y, batch_size, one_hot=True):
+        num_samples = X.shape[0]
+        p = np.random.permutation(X.shape[0])
+        X, y = X[p], y[p]
+        X = tf.data.Dataset.from_tensor_slices(X)
+        y = tf.data.Dataset.from_tensor_slices(y)
+        if one_hot:
+            y = y.map(lambda z: tf.one_hot(z, 10))
+        dataset = tf.data.Dataset.zip((X, y)).shuffle(num_samples).batch(batch_size)
+        return dataset
+
+
+    def sample_mini_dataset(self, num_classes, num_shots, test_shots):
+        shuffled = list(self.data_source)
+        random.shuffle(shuffled)
+        cs = shuffled[:num_classes]
+        X = []
+        y = []
+        X_test = []
+        y_test = []
+        for idx, c in enumerate(cs):
+            inputs = c.sample(num_shots+test_shots)
+            targets = np.array([idx for i in range(num_shots+test_shots)])
+            X.append(inputs[:num_shots])
+            y.append(targets[:num_shots])
+            X_test.append(inputs[num_shots:])
+            y_test.append(targets[num_shots:])
+        X = np.concatenate(X, axis=0)
+        y = np.concatenate(y, axis=0)
+        X_test = np.concatenate(X_test, axis=0)
+        y_test = np.concatenate(y_test, axis=0)
+
+        train_set = self._load_dataset(X, y, self.inner_batch_size, self.one_hot)
+        test_set = self._load_dataset(X_test, y_test, self.inner_batch_size, self.one_hot)
+        return train_set, test_set
+
+
 
 
 class OmniglotDataSource(DataSource):
@@ -19,7 +104,7 @@ class OmniglotDataSource(DataSource):
     def __init__(self, data_dir):
         self.data_dir = data_dir
         self.data = None
-        
+
     def _load(self):
         self.data = read_dataset(self.data_dir)
 

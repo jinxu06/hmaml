@@ -2,13 +2,24 @@ import tensorflow as tf
 import numpy as np
 
 
-def load(batch_size, split=[50000, 10000, 10000], one_hot=True):
+def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=True):
+    classes = np.random.choice(10, num_classes, replace=False).astype(np.int32)
     from sklearn.datasets import fetch_mldata
-    mnist = fetch_mldata('MNIST original', data_home="~/scikit_learn_data")
+    mnist = fetch_mldata('MNIST original', data_home=data_dir)
     images = mnist['data'].astype(np.float32)
     targets = mnist['target'].astype(np.int32)
+    imgs, ts = [], []
+    for img, t in zip(images, targets):
+        if t in classes:
+            imgs.append(img)
+            ts.append(t)
+    images, targets = np.array(imgs), np.array(ts)
     p = np.random.permutation(images.shape[0])
     images, targets = images[p], targets[p]
+    num_samples = images.shape[0]
+    split = [int(np.rint(num_samples*s)) for s in split]
+    split[-1] += num_samples - np.sum(split)
+    print(split)
     datasets = []
     begin = 0
     for s in split:

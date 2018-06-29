@@ -4,16 +4,13 @@ import tensorflow as tf
 # plt.style.use("ggplot")
 
 import data.mnist as mnist
-import data.omniglot as omniglot
 from models.classifiers import MNISTClassifier
 
-
-train_meta_dataset, test_meta_dataset = omniglot.load(data_dir="/Users/Aaron-MAC/mldata/omniglot", inner_batch_size=5, num_train=1200, augment_train_set=False, one_hot=True)
-datasets = train_meta_dataset.sample_mini_dataset(num_classes=5, num_shots=19, test_shots=1)
+datasets = mnist.load(data_dir="~/scikit_learn_data", num_classes=5, batch_size=100, split=[5./7, 1./7, 1./7])
 
 from data.data_iterator import DataIterator
 
-data_iter = DataIterator(train_set=datasets[0], val_set=None, test_set=datasets[1])
+data_iter = DataIterator(train_set=datasets[0], val_set=datasets[1], test_set=datasets[2])
 
 model = MNISTClassifier(num_classes=10, inputs=data_iter.next_op[0], targets=data_iter.next_op[1])
 
@@ -72,7 +69,7 @@ with tf.Session(config=config) as sess:
         if k%5 == 0:
             evals = eval_epoch(sess, model, 'train', data_iter)
             print(evals)
-            # evals = eval_epoch(sess, model, 'val', data_iter)
-            # print(evals)
+            evals = eval_epoch(sess, model, 'val', data_iter)
+            print(evals)
             evals = eval_epoch(sess, model, 'test', data_iter)
             print(evals)
