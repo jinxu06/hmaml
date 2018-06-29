@@ -16,4 +16,4 @@ class MetaDataset(object):
         Return:
             tf.data.Dataset
         """
-        self.data_source.sample
+        pass 

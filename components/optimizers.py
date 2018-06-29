@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
-from blocks.helpers import int_shape, get_name
+from misc.helpers import int_shape, get_name
+from misc.variables import (interpolate_vars, average_vars, subtract_vars,
+                                    add_vars, scale_vars, VariableState)
 
 def adam_updates(params, cost_or_grads, lr=0.001, mom1=0.9, mom2=0.999):
     ''' Adam optimizer '''

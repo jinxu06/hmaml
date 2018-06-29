@@ -16,33 +16,64 @@ class Learner(object):
 
         self.model = model
 
-    def evaluate(self, data_iter, metric_op, minimize_op, num_iter=5):
 
-        old_vars = self._full_state.export_variables()
 
-        evals = []
-        for i in range(num_iter):
-            self.session.run(data_iter.init_train_set_op)
-            while True:
-                try:
-                    _ = self.session.run(minimize_op, feed_dict={self.model.is_training: True})
-                except tf.errors.OutOfRangeError:
-                    break
+    def evaluate(self, dataset, metrics=["loss", "accuracy"]):
 
-            self.session.run(data_iter.init_test_set_op)
-            count = 0
-            arr = []
-            while True:
-                try:
-                    m = self.session.run(metric_op, feed_dict={self.model.is_training: False})
-                    count += 1
-                except tf.errors.OutOfRangeError:
-                    break
-                arr.append(m)
-            evals.append(np.mean(arr))
+        ops = [self.model.evals[m] for m in metrics]
+        evals_sum = {m:0. for m in metrics}
 
-        self._full_state.import_variables(old_vars)
-        return evals
+        for count, (X, y) in enumerate(dataset):
+            evals = self.session.run(ops, feed_dict={self.model.inputs:X, self.model.targets:y, self.model.is_training:False})
+            for i, m in enumerate(metrics):
+                evals_sum[m] += evals[i]
+        evals_mean = {m:evals_sum[m] / (count+1) for m in metrics}
+        return evals_mean
+
+
+    def one_shot_train_step(self, one_shot_data_iter, minimize_op, batch_size, step_size):
+
+        old_vars = self._model_state.export_variables()
+        updates = []
+        for _ in range(batch_size):
+            X, y = next(one_shot_data_iter)
+            for i in range(2):
+                last_vars = self._model_state.export_variables()
+                _ = self.session.run(minimize_op, feed_dict={self.model.inputs:X, self.model.targets:y, self.model.is_training: True})
+            updates.append(subtract_vars(self._model_state.export_variables(), last_vars))
+            self._model_state.import_variables(old_vars)
+        update = average_vars(updates)
+        self._model_state.import_variables(add_vars(old_vars, scale_vars(update, step_size)))
+
+
+    def train_step(self,
+                   dataset,
+                   input_ph,
+                   label_ph,
+                   minimize_op,
+                   num_classes,
+                   num_shots,
+                   inner_batch_size,
+                   inner_iters,
+                   replacement,
+                   meta_step_size,
+                   meta_batch_size):
+        old_vars = self._model_state.export_variables()
+        updates = []
+        for _ in range(meta_batch_size):
+            mini_dataset = dataset.sample_task(num_shots, num_classes)
+            mini_batches = dataset.mini_batch(mini_dataset, inner_batch_size, inner_iters,
+                                              replacement)
+            for batch in mini_batches:
+                inputs, labels = zip(*batch)
+                last_backup = self._model_state.export_variables()
+                if self._pre_step_op:
+                    self.session.run(self._pre_step_op)
+                self.session.run(minimize_op, feed_dict={input_ph: inputs, label_ph: labels})
+            updates.append(subtract_vars(self._model_state.export_variables(), last_backup))
+            self._model_state.import_variables(old_vars)
+        update = average_vars(updates)
+        self._model_state.import_variables(add_vars(old_vars, scale_vars(update, meta_step_size)))
 
 
     # def evaluate(self,

@@ -1,5 +1,7 @@
 import tensorflow as tf
 import numpy as np
+from data.dataset import Dataset
+import misc.helpers as helpers
 
 
 def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=True):
@@ -24,12 +26,32 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
     for s in split:
         end = begin + s
         X = images[begin:end]
+        X = np.reshape(X, newshape=(s, 28, 28))
         y = targets[begin:end]
+        if one_hot:
+            y = helpers.one_hot(y, len(classes))
+        dataset = Dataset(X=X, y=y, shuffle=False)
+        datasets.append(dataset)
+        begin = end
+    datasets[0].shuffle = True
+    return datasets
+
+
+class MetaDataset(object):
+
+    def __init__(self, data_source, inner_batch_size=1, one_hot=True):
+        pass
+
+    def _load_dataset(self, X, y, num_classes, batch_size, one_hot=True):
+        num_samples = X.shape[0]
+        p = np.random.permutation(X.shape[0])
+        X, y = X[p], y[p]
         X = tf.data.Dataset.from_tensor_slices(X)
         y = tf.data.Dataset.from_tensor_slices(y)
         if one_hot:
-            y = y.map(lambda z: tf.one_hot(z, len(classes)))
-        dataset = tf.data.Dataset.zip((X, y)).shuffle(s).batch(batch_size)
-        datasets.append(dataset)
-        begin = end
-    return datasets
+            y = y.map(lambda z: tf.one_hot(z, num_classes))
+        dataset = tf.data.Dataset.zip((X, y)).shuffle(num_samples).batch(batch_size)
+        return dataset
+
+    def sample_mini_dataset(self):
+        pass

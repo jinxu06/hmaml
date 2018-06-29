@@ -11,7 +11,7 @@ class MNISTClassifier(object):
         if inputs is None:
             inputs = tf.placeholder(tf.float32, shape=(None, 28, 28))
         if targets is None:
-            targets = tf.placeholder(tf.int32, shape=(None, 10))
+            targets = tf.placeholder(tf.int32, shape=(None, num_classes))
         self.inputs, self.targets = inputs, targets
         self.outputs = self._model(self.inputs)
         self.loss = self._loss(self.outputs, self.targets)
@@ -31,7 +31,8 @@ class MNISTClassifier(object):
         return out
 
     def _loss(self, outputs, targets):
-        return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=targets, logits=outputs))
+        self.batch_losses = tf.nn.softmax_cross_entropy_with_logits_v2(labels=targets, logits=outputs)
+        return tf.reduce_mean(self.batch_losses)
 
     def _eval(self, outputs, targets):
         preds = tf.argmax(outputs, 1)

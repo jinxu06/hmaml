@@ -1,58 +1,30 @@
-import os
-import random
+import numpy as np
 import tensorflow as tf
+from models.classifiers import MNISTClassifier
+from components.learners import Learner
+import data.mnist as mnist
 
-from misc.args import argument_parser, model_kwargs, train_kwargs, evaluate_kwargs
-from executions.eval import evaluate
-from components.models import OmniglotModel
-from data.omniglot import read_dataset, split_dataset, augment_dataset
-from executions.train import train
-
-DATA_DIR = "/Users/Aaron-MAC/Code/supervised-reptile/data/omniglot"
-CHECKPOINT_DIR = "model_checkpoint"
-# DATA_DIR = "/data/ziz/not-backed-up/jxu/omniglot"
-# CHECKPOINT_DIR = "/data/ziz/jxu/hmaml-checkpoints"
-
-def test_sinusoid_data():
-    pass
-
-def test_omniglot_data():
-    pass
-
-def test_miniimagenet():
-    pass
+datasets = mnist.load(data_dir="~/scikit_learn_data", num_classes=5, batch_size=100, split=[5./7, 1./7, 1./7])
+dataset = datasets[0]
+dataset.make_iterator(1)
+val_dataset = datasets[1]
+val_dataset.make_iterator(100)
 
 
-def main():
-    """
-    Load data and train a model on it.
-    """
-    args = argument_parser().parse_args()
-    random.seed(args.seed)
+model = MNISTClassifier(num_classes=5, inputs=None, targets=None)
+update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+with tf.control_dependencies(update_ops):
+    optimizer = tf.train.AdamOptimizer(1e-4).minimize(model.loss)
 
-    args.checkpoint_dir = CHECKPOINT_DIR ###
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
+global_init_op = tf.global_variables_initializer()
 
-    train_set, test_set = split_dataset(read_dataset(DATA_DIR))
-    train_set = list(augment_dataset(train_set))
-    test_set = list(test_set)
-
-    # model = OmniglotModel(args.classes, **model_kwargs(args))
-    #
-    # config = tf.ConfigProto()
-    # config.gpu_options.allow_growth = True
-    # with tf.Session(config=config) as sess:
-    #     if not args.pretrained:
-    #         print('Training...')
-    #         train(sess, model, train_set, test_set, os.path.join(args.checkpoint_dir, args.checkpoint), **train_kwargs(args))
-    #     else:
-    #         print('Restoring from checkpoint...')
-    #         tf.train.Saver().restore(sess, tf.train.latest_checkpoint(os.path.join(args.checkpoint_dir, args.checkpoint)))
-    #
-    #     print('Evaluating...')
-    #     eval_kwargs = evaluate_kwargs(args)
-    #     print('Train accuracy: ' + str(evaluate(sess, model, train_set, **eval_kwargs)))
-    #     print('Test accuracy: ' + str(evaluate(sess, model, test_set, **eval_kwargs)))
-
-if __name__ == '__main__':
-    main()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as sess:
+    sess.run(global_init_op)
+    learner = Learner(session=sess, model=model)
+    for epoch in range(20):
+        for k in range(500):
+            learner.one_shot_train_step(dataset, optimizer, batch_size=100, step_size=0.1)
+        evals = learner.evaluate(val_dataset)
+        print(evals)
