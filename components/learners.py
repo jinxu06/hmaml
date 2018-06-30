@@ -39,6 +39,25 @@ class Learner(object):
             }
             _ = self.session.run(minimize_op, feed_dict=feed_dict)
 
+    def train1(self, dataset, minimize_op, num_components=2, step_size=0.1):
+        for X, y in dataset:
+            old_vars = self._model_state.export_variables()
+            updates = []
+            for c in range(num_components):
+                feed_dict = {
+                    self.model.inputs: X,
+                    self.model.targets: y,
+                    self.model.sample_weights: np.ones((X.shape[0],)) / X.shape[0],
+                    self.model.is_training: True,
+                }
+                for i in range(2):
+                    last_vars = self._model_state.export_variables()
+                    _ = self.session.run(minimize_op, feed_dict=feed_dict)
+                updates.append(subtract_vars(self._model_state.export_variables(), last_vars))
+                self._model_state.import_variables(old_vars)
+            update = average_vars(updates)
+            self._model_state.import_variables(add_vars(old_vars, scale_vars(update, step_size)))
+
 
 
     def one_shot_train_step(self, one_shot_data_iter, minimize_op, batch_size, step_size):

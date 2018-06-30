@@ -23,7 +23,7 @@ with tf.Session(config=config) as sess:
     learner = Learner(session=sess, model=model)
     for epoch in range(20):
         print(epoch, "......")
-        learner.train(dataset, optimizer)
+        learner.train1(dataset, optimizer)
         evals = learner.evaluate(val_dataset)
         print(evals)
 
