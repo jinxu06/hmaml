@@ -5,7 +5,7 @@ from components.learners import Learner
 import data.mnist as mnist
 
 meta_train_set, meta_val_set, meta_test_set = mnist.load(data_dir="~/scikit_learn_data", num_classes=5, batch_size=5, split=[5./7, 1./7, 1./7], return_meta=True)
-train_set, test_set = meta_train_set.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5, classes=[5,6,7,8,9])
+train_set, test_set = meta_train_set.sample_mini_dataset(num_classes=5, num_shots=1000, test_shots=5, classes=[5,6,7,8,9])
 
 
 model = MNISTClassifier(num_classes=5, inputs=None, targets=None)
