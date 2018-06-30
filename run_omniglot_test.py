@@ -50,4 +50,5 @@ with tf.Session(config=config) as sess:
             evals = learner.evaluate(val_set)
             accs.append(evals["accuracy"])
         acc_arr.append(accs)
-    print(np.array(acc_arr))
+    m = np.array(acc_arr)
+    print(m.mean(0))
