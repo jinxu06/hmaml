@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class Dataset(object):
 
-    def __init__(self, X, y=None, shuffle=True):
+    def __init__(self, batch_size, X, y=None, shuffle=True):
         self.init_X = X
         self.init_y = y
         self.size = X.shape[0]
@@ -32,9 +32,6 @@ class Dataset(object):
             return self.X[begin:end], self.y[begin:end]
         else:
             return self.X[begin:end]
-
-    def make_iterator(self, batch_size):
-        self.batch_size = batch_size
 
 
     def __iter__(self):

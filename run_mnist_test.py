@@ -6,9 +6,7 @@ import data.mnist as mnist
 
 datasets = mnist.load(data_dir="~/scikit_learn_data", num_classes=5, batch_size=100, split=[5./7, 1./7, 1./7])
 dataset = datasets[0]
-dataset.make_iterator(100)
 val_dataset = datasets[1]
-val_dataset.make_iterator(100)
 
 
 model = MNISTClassifier(num_classes=5, inputs=None, targets=None)
@@ -23,16 +21,11 @@ config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
     sess.run(global_init_op)
     learner = Learner(session=sess, model=model)
-    for X, y in dataset:
-        feed_dict = {
-            model.inputs: X,
-            model.targets: y,
-            model.is_training: True,
-            model.sample_weights: np.ones((X.shape[0],)) / X.shape[0],
-        }
-        learner.train_step(optimizer, feed_dict=feed_dict)
-    evals = learner.evaluate(val_dataset)
-    print(evals)
+    for epoch in range(20):
+        print(epoch, "......")
+        learner.train(dataset, optimizer)
+        evals = learner.evaluate(val_dataset)
+        print(evals)
 
     # for epoch in range(20):
     #     for k in range(5000):

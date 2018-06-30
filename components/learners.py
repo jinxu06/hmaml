@@ -17,7 +17,6 @@ class Learner(object):
         self.model = model
 
 
-
     def evaluate(self, dataset, metrics=["loss", "accuracy"]):
 
         ops = [self.model.evals[m] for m in metrics]
@@ -30,8 +29,16 @@ class Learner(object):
         evals_mean = {m:evals_sum[m] / (count+1) for m in metrics}
         return evals_mean
 
-    def train_step(self, minimize_op, feed_dict):
-        _ = self.session.run(minimize_op, feed_dict=feed_dict)
+    def train(self, dataset, minimize_op):
+        for X, y in dataset:
+            feed_dict = {
+                self.model.inputs: X,
+                self.model.targets: y,
+                self.sample_weights: np.ones((X.shape[0],)) / X.shape[0],
+                self.is_training: True,
+            }
+            _ = self.session.run(minimize_op, feed_dict=feed_dict)
+
 
 
     def one_shot_train_step(self, one_shot_data_iter, minimize_op, batch_size, step_size):

@@ -30,7 +30,7 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
         y = targets[begin:end]
         if one_hot:
             y = helpers.one_hot(y, len(classes))
-        dataset = Dataset(X=X, y=y, shuffle=False)
+        dataset = Dataset(batch_size=batch_size, X=X, y=y, shuffle=False)
         datasets.append(dataset)
         begin = end
     datasets[0].shuffle = True
