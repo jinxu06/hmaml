@@ -8,6 +8,7 @@ import data.omniglot as omniglot
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--load_params', help='', action='store_true', default=False)
+parser.add_argument('--num_inner_iters', help='', default=10, type=int)
 args = parser.parse_args()
 
 
@@ -44,7 +45,7 @@ with tf.Session(config=config) as sess:
 
         learner = Learner(session=sess, model=model)
         accs = []
-        for epoch in range(10):
+        for epoch in range(args.num_inner_iters):
             # print(epoch, "......")
             learner.train(train_set, optimizer)
             evals = learner.evaluate(val_set)

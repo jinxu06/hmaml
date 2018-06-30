@@ -14,6 +14,7 @@ from data.data_iterator import DataIterator
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--load_params', help='', action='store_true', default=False)
+
 args = parser.parse_args()
 
 
