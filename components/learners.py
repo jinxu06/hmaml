@@ -49,7 +49,7 @@ class Learner(object):
                 feed_dict = {
                     self.model.inputs: X,
                     self.model.targets: y,
-                    self.model.sample_weights: one_hot_y[:, c]#np.ones((X.shape[0],)) / X.shape[0],
+                    self.model.sample_weights: one_hot_y[:, c], #np.ones((X.shape[0],)) / X.shape[0],
                     self.model.is_training: True,
                 }
                 for i in range(2):
