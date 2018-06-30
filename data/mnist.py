@@ -15,6 +15,7 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
         if t in classes:
             imgs.append(img)
             ts.append(t)
+    classes = [c-min(classes) for c in classes]
     images, targets = np.array(imgs), np.array(ts)
     p = np.random.permutation(images.shape[0])
     images, targets = images[p], targets[p]
