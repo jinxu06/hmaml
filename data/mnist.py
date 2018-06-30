@@ -35,7 +35,7 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
             dataset = MNIST(inner_batch_size=batch_size, X=X, y=y)
             datasets.append(dataset)
             begin = end
-        return datasets 
+        return datasets
     for s in split:
         end = begin + s
         X = images[begin:end]
@@ -72,3 +72,9 @@ class MNIST(object):
     def sample_mini_dataset(self, num_classes, num_shots, test_shots, classes=None):
         if classes is None:
             classes = np.random.choice(10, 5)
+        p = np.random.choice(self.X.shape[0], size=num_shots+test_shots, replace=False)
+        X, y = self.X[p[:num_shots]], self.y[p[:num_shots]]
+        X_test, y_test = self.X[p[num_shots:]], self.y[p[num_shots:]]
+        train_set = Dataset(batch_size=self.inner_batch_size, X=X, y=y, shuffle=True)
+        test_set = Dataset(batch_size=self.inner_batch_size, X=X_test, y=y_test, shuffle=False)
+        return train_set, test_set
