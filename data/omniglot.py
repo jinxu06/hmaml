@@ -11,8 +11,9 @@ import random
 from PIL import Image
 import numpy as np
 import tensorflow as tf
-
+import misc.helpers as helpers
 from .data_source import DataSource
+from data.dataset import Dataset
 
 # def _sample_mini_dataset(data_dir, num_classes, num_shots=20):
 #     ds = OmniglotDataSource(data_dir=data_dir)
@@ -49,27 +50,28 @@ from .data_source import DataSource
 def load(data_dir, inner_batch_size, num_train=1200, augment_train_set=False, one_hot=True):
     ds = OmniglotDataSource(data_dir=data_dir)
     ds.split_train_test(num_train, augment_train_set=augment_train_set)
-    train_meta_dataset = MetaDataset(ds.train_set, inner_batch_size, one_hot)
-    test_meta_dataset = MetaDataset(ds.test_set, inner_batch_size, one_hot)
+    train_meta_dataset = Omniglot(ds.train_set, inner_batch_size, one_hot)
+    test_meta_dataset = Omniglot(ds.test_set, inner_batch_size, one_hot)
     return train_meta_dataset, test_meta_dataset
 
-class MetaDataset(object):
+
+class Omniglot(object):
 
     def __init__(self, data_source, inner_batch_size, one_hot=True):
         self.data_source = data_source
         self.inner_batch_size = inner_batch_size
         self.one_hot = one_hot
 
-    def _load_dataset(self, X, y, num_classes, batch_size, one_hot=True):
-        num_samples = X.shape[0]
-        p = np.random.permutation(X.shape[0])
-        X, y = X[p], y[p]
-        X = tf.data.Dataset.from_tensor_slices(X)
-        y = tf.data.Dataset.from_tensor_slices(y)
-        if one_hot:
-            y = y.map(lambda z: tf.one_hot(z, num_classes))
-        dataset = tf.data.Dataset.zip((X, y)).shuffle(num_samples).batch(batch_size)
-        return dataset
+    # def _load_dataset(self, X, y, num_classes, batch_size, one_hot=True):
+    #     num_samples = X.shape[0]
+    #     p = np.random.permutation(X.shape[0])
+    #     X, y = X[p], y[p]
+    #     X = tf.data.Dataset.from_tensor_slices(X)
+    #     y = tf.data.Dataset.from_tensor_slices(y)
+    #     if one_hot:
+    #         y = y.map(lambda z: tf.one_hot(z, num_classes))
+    #     dataset = tf.data.Dataset.zip((X, y)).shuffle(num_samples).batch(batch_size)
+    #     return dataset
 
 
     def sample_mini_dataset(self, num_classes, num_shots, test_shots):
@@ -92,8 +94,14 @@ class MetaDataset(object):
         X_test = np.concatenate(X_test, axis=0)
         y_test = np.concatenate(y_test, axis=0)
 
-        train_set = self._load_dataset(X, y, num_classes, self.inner_batch_size, self.one_hot)
-        test_set = self._load_dataset(X_test, y_test, num_classes, self.inner_batch_size, self.one_hot)
+        if self.one_hot:
+            y = helpers.one_hot(y, num_classes)
+            y_test = helpers.one_hot(y_test, num_classes)
+
+        train_set = Dataset(batch_size=self.inner_batch_size, X=X, y=y, shuffle=True)
+        test_set = Dataset(batch_size=self.inner_batch_size, X=X_test, y=y_test, shuffle=False)
+        # train_set = self._load_dataset(X, y, num_classes, self.inner_batch_size, self.one_hot)
+        # test_set = self._load_dataset(X_test, y_test, num_classes, self.inner_batch_size, self.one_hot)
         return train_set, test_set
 
 
