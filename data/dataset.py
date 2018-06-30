@@ -14,6 +14,7 @@ class Dataset(object):
             self.y = None
         self.cur_pos = 0
         self.shuffle = shuffle
+        self.batch_size = batch_size
 
     def reset(self):
         # self.X = self.init_X.copy()
