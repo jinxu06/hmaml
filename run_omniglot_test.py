@@ -45,7 +45,7 @@ with tf.Session(config=config) as sess:
         learner = Learner(session=sess, model=model)
         accs = []
         for epoch in range(10):
-            print(epoch, "......")
+            # print(epoch, "......")
             learner.train(train_set, optimizer)
             evals = learner.evaluate(val_set)
             accs.append(evals["accuracy"])

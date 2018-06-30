@@ -16,6 +16,9 @@ with tf.control_dependencies(update_ops):
 
 global_init_op = tf.global_variables_initializer()
 
+saver = tf.train.Saver()
+save_dir = "/data/ziz/jxu/hmaml-saved-models"
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
@@ -26,6 +29,8 @@ with tf.Session(config=config) as sess:
         learner.train1(dataset, optimizer)
         evals = learner.evaluate(val_dataset)
         print(evals)
+
+    saver.save(sess, save_dir + '/params_' + "mnist" + '.ckpt')
 
     # for epoch in range(20):
     #     for k in range(5000):
