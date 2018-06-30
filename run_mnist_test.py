@@ -23,6 +23,11 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
     sess.run(global_init_op)
+
+    ckpt_file = save_dir + '/params_' + "mnist" + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
+    
     learner = Learner(session=sess, model=model)
     for epoch in range(20):
         print(epoch, "......")
