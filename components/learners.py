@@ -34,8 +34,8 @@ class Learner(object):
             feed_dict = {
                 self.model.inputs: X,
                 self.model.targets: y,
-                self.sample_weights: np.ones((X.shape[0],)) / X.shape[0],
-                self.is_training: True,
+                self.model.sample_weights: np.ones((X.shape[0],)) / X.shape[0],
+                self.model.is_training: True,
             }
             _ = self.session.run(minimize_op, feed_dict=feed_dict)
 
