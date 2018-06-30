@@ -32,7 +32,10 @@ class Learner(object):
 
 
     def one_shot_train_step(self, one_shot_data_iter, minimize_op, batch_size, step_size):
+        begin = time.time()
         old_vars = self._model_state.export_variables()
+        print(time.time()-begin)
+        quit() 
         updates = []
         for _ in range(batch_size):
             begin = time.time()
