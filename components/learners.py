@@ -24,7 +24,7 @@ class Learner(object):
         evals_sum = {m:0. for m in metrics}
 
         for count, (X, y) in enumerate(dataset):
-            evals = self.session.run(ops, feed_dict={self.model.inputs:X, self.model.targets:y, self.model.sample_weights:np.zeros((X.shape[0],))/X.shape[0], self.model.is_training:False})
+            evals = self.session.run(ops, feed_dict={self.model.inputs:X, self.model.targets:y, self.model.sample_weights:np.ones((X.shape[0],))/X.shape[0], self.model.is_training:False})
             for i, m in enumerate(metrics):
                 evals_sum[m] += evals[i]
         evals_mean = {m:evals_sum[m] / (count+1) for m in metrics}

@@ -18,7 +18,7 @@ class MNISTClassifier(object):
         if sample_weights is None:
             sample_weights = tf.placeholder(tf.float32, shape=(None,))
         self.sample_weights = sample_weights
-        self.loss = tf.multiply(self.losses, self.sample_weights)
+        self.loss = tf.reduce_sum(tf.multiply(self.losses, self.sample_weights))
         self.evals = self._eval(self.outputs, self.targets)
 
     def _model(self, inputs):
