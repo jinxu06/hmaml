@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from misc.variables import (interpolate_vars, average_vars, subtract_vars,
                                     add_vars, scale_vars, VariableState)
-
+import time
 
 class Learner(object):
 
@@ -32,16 +32,20 @@ class Learner(object):
 
 
     def one_shot_train_step(self, one_shot_data_iter, minimize_op, batch_size, step_size):
-
         old_vars = self._model_state.export_variables()
         updates = []
         for _ in range(batch_size):
+            begin = time.time()
             X, y = next(one_shot_data_iter)
+            print(time.time()-begin)
             for i in range(2):
                 last_vars = self._model_state.export_variables()
                 _ = self.session.run(minimize_op, feed_dict={self.model.inputs:X, self.model.targets:y, self.model.is_training: True})
+            print(time.time()-begin)
             updates.append(subtract_vars(self._model_state.export_variables(), last_vars))
             self._model_state.import_variables(old_vars)
+            print(time.time()-begin)
+            print("......")
         update = average_vars(updates)
         self._model_state.import_variables(add_vars(old_vars, scale_vars(update, step_size)))
 
