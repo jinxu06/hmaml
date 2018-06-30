@@ -44,12 +44,11 @@ class Learner(object):
         for X, y in dataset:
             old_vars = self._model_state.export_variables()
             updates = []
-            one_hot_y = helpers.one_hot(y, 5)
             for c in range(num_components):
                 feed_dict = {
                     self.model.inputs: X,
                     self.model.targets: y,
-                    self.model.sample_weights: one_hot_y[:, c], #np.ones((X.shape[0],)) / X.shape[0],
+                    self.model.sample_weights: y[:, c], #np.ones((X.shape[0],)) / X.shape[0],
                     self.model.is_training: True,
                 }
                 for i in range(2):
