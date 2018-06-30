@@ -15,7 +15,6 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
         if t in classes:
             imgs.append(img)
             ts.append(t)
-    classes = [c-min(classes) for c in classes]
     images, targets = np.array(imgs), np.array(ts)
     p = np.random.permutation(images.shape[0])
     images, targets = images[p], targets[p]
@@ -29,6 +28,7 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
         X = images[begin:end]
         X = np.reshape(X, newshape=(s, 28, 28))
         y = targets[begin:end]
+        y -= np.min(y)
         if one_hot:
             y = helpers.one_hot(y, len(classes))
         dataset = Dataset(batch_size=batch_size, X=X, y=y, shuffle=False)
