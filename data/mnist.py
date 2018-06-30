@@ -29,9 +29,9 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
             X = images[begin:end]
             X = np.reshape(X, newshape=(s, 28, 28))
             y = targets[begin:end]
-            y -= np.min(y)
-            if one_hot:
-                y = helpers.one_hot(y, len(classes))
+            # y -= np.min(y)
+            # if one_hot:
+            #     y = helpers.one_hot(y, len(classes))
             dataset = MNIST(inner_batch_size=batch_size, X=X, y=y)
             datasets.append(dataset)
             begin = end
@@ -53,10 +53,11 @@ def load(data_dir, num_classes, batch_size, split=[5./7, 1./7, 1./7], one_hot=Tr
 
 class MNIST(object):
 
-    def __init__(self, X, y, inner_batch_size):
+    def __init__(self, X, y, inner_batch_size, one_hot=True):
         self.X = X
         self.y = y
         self.inner_batch_size = inner_batch_size
+        self.one_hot = one_hot
 
     # def _load_dataset(self, X, y, num_classes, batch_size, one_hot=True):
     #     num_samples = X.shape[0]
@@ -72,9 +73,21 @@ class MNIST(object):
     def sample_mini_dataset(self, num_classes, num_shots, test_shots, classes=None):
         if classes is None:
             classes = np.random.choice(10, 5)
-        p = np.random.choice(self.X.shape[0], size=num_shots+test_shots, replace=False)
-        X, y = self.X[p[:num_shots]], self.y[p[:num_shots]]
-        X_test, y_test = self.X[p[num_shots:]], self.y[p[num_shots:]]
+        X, y, X_test, y_test = [], [], [], []
+        for idx, c in enumerate(classes):
+            X_c = self.X[self.y==c]
+            p = np.random.choice(X_c.shape[0], size=num_shots+test_shots, replace=False)
+            X.append(X_c[p[:num_shots]])
+            X_test.append(X_c[p[num_shots:]])
+            y.append(np.ones(num_shots,)*idx)
+            y_test.append(np.ones(test_shots,)*idx)
+        X = np.concatenate(X, axis=0)
+        X_test = np.concatenate(X_test, axis=0)
+        y = np.concatenate(y, axis=0)
+        y_test = np.concatenate(y_test, axis=0)
+        if self.one_hot:
+            y = helpers.one_hot(y, num_classes)
+            y_test = helpers.one_hot(y_test, num_classes)
         train_set = Dataset(batch_size=self.inner_batch_size, X=X, y=y, shuffle=True)
         test_set = Dataset(batch_size=self.inner_batch_size, X=X_test, y=y_test, shuffle=False)
         return train_set, test_set
