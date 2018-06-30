@@ -37,15 +37,17 @@ with tf.Session(config=config) as sess:
         ckpt_file = save_dir + '/params_' + "mnist" + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
-    for dk in range(5):
-        print("*******************")
+    acc_arr = []
+    for dk in range(20):
+        print(dk, "resample dataset...")
         train_set, val_set = meta_train_set.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5)
 
         learner = Learner(session=sess, model=model)
+        accs = []
         for epoch in range(10):
             print(epoch, "......")
             learner.train(train_set, optimizer)
-            evals = learner.evaluate(train_set)
-            print(evals)
             evals = learner.evaluate(val_set)
-            print(evals)
+            accs.append(evals["accuracy"])
+        acc_arr.append(accs)
+    print(np.array(acc_arr))
