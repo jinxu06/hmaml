@@ -3,6 +3,7 @@ import tensorflow as tf
 from misc.variables import (interpolate_vars, average_vars, subtract_vars,
                                     add_vars, scale_vars, VariableState)
 import time
+import misc.helpers as helpers
 
 class Learner(object):
 
@@ -39,15 +40,16 @@ class Learner(object):
             }
             _ = self.session.run(minimize_op, feed_dict=feed_dict)
 
-    def train1(self, dataset, minimize_op, num_components=2, step_size=0.1):
+    def train1(self, dataset, minimize_op, num_components=5, step_size=0.1):
         for X, y in dataset:
             old_vars = self._model_state.export_variables()
             updates = []
+            one_hot_y = helpers.one_hot(y, 5)
             for c in range(num_components):
                 feed_dict = {
                     self.model.inputs: X,
                     self.model.targets: y,
-                    self.model.sample_weights: np.ones((X.shape[0],)) / X.shape[0],
+                    self.model.sample_weights: one_hot_y[:, c]#np.ones((X.shape[0],)) / X.shape[0],
                     self.model.is_training: True,
                 }
                 for i in range(2):
