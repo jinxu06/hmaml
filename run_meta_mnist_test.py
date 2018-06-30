@@ -40,7 +40,7 @@ with tf.Session(config=config) as sess:
             saver.restore(sess, ckpt_file)
 
         print(dk, "resample dataset...")
-        train_set, val_set = meta_train_set.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5, classes=[0，1，2，3，4])
+        train_set, val_set = meta_train_set.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5, classes=[0,1,2,3,4])
 
         learner = Learner(session=sess, model=model)
         accs = []
