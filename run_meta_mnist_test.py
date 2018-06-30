@@ -4,7 +4,7 @@ from models.classifiers import MNISTClassifier
 from components.learners import Learner
 import data.mnist as mnist
 
-meta_train_set, meta_test_set = mnist.load(data_dir="~/scikit_learn_data", num_classes=5, batch_size=5, split=[5./7, 1./7, 1./7], return_meta=True)
+meta_train_set, meta_val_set, meta_test_set = mnist.load(data_dir="~/scikit_learn_data", num_classes=5, batch_size=5, split=[5./7, 1./7, 1./7], return_meta=True)
 train_set, test_set = meta_train_set.sample_mini_dataset(num_classes=5, num_shots=15, test_shots=5, classes=[5,6,7,8,9])
 
 
@@ -31,7 +31,7 @@ with tf.Session(config=config) as sess:
     for epoch in range(20):
         print(epoch, "......")
         learner.train(train_set, optimizer)
-        evals = learner.evaluate(val_set)
+        evals = learner.evaluate(test_set)
         print(evals)
 
     # saver.save(sess, save_dir + '/params_' + "mnist" + '.ckpt')
