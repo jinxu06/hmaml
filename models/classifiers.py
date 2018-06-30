@@ -5,7 +5,7 @@ from components.layers import conv2d, dense
 
 class MNISTClassifier(object):
 
-    def __init__(self, num_classes, inputs=None, targets=None):
+    def __init__(self, num_classes, inputs=None, targets=None, sample_weights=None):
         self.num_classes = num_classes
         self.is_training = tf.placeholder(tf.bool, shape=())
         if inputs is None:
@@ -14,7 +14,11 @@ class MNISTClassifier(object):
             targets = tf.placeholder(tf.int32, shape=(None, num_classes))
         self.inputs, self.targets = inputs, targets
         self.outputs = self._model(self.inputs)
-        self.loss = self._loss(self.outputs, self.targets)
+        self.losses = self._loss(self.outputs, self.targets)
+        if sample_weights is None:
+            sample_weights = tf.placeholder(tf.float32, shape=(None,))
+        self.sample_weights = sample_weights
+        self.loss = tf.multiply(self.losses, self.sample_weights)
         self.evals = self._eval(self.outputs, self.targets)
 
     def _model(self, inputs):
@@ -31,8 +35,8 @@ class MNISTClassifier(object):
         return out
 
     def _loss(self, outputs, targets):
-        self.batch_losses = tf.nn.softmax_cross_entropy_with_logits_v2(labels=targets, logits=outputs)
-        return tf.reduce_mean(self.batch_losses)
+        losses = tf.nn.softmax_cross_entropy_with_logits_v2(labels=targets, logits=outputs)
+        return losses
 
     def _eval(self, outputs, targets):
         preds = tf.argmax(outputs, 1)
